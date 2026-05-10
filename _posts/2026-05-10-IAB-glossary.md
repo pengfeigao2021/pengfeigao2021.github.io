@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Advertising Terms Study Note
+title: Advertising Terms
 subtitle: A compact map of common ad-tech, media-buying, channel, and measurement terms.
 cover-img: /assets/img/posts/2026-05-10/cover.png
 thumbnail-img: /assets/img/posts/2026-05-10/th.png
@@ -9,7 +9,7 @@ tags: [advertising, ad-tech, media-buying, measurement]
 author: Pengfei Gao
 ---
 
-Advertising has many specialized terms across audience targeting, media buying, ad delivery, creative formats, and campaign measurement. This note summarizes common ad-tech and media-buying concepts in a compact, interview-friendly way.
+This note summarizes common ad-tech and media-buying concepts in a compact, interview-friendly way.
 
 ## 1. Big Picture
 
@@ -96,10 +96,9 @@ Did the target audience see the ad? Did the campaign create business value? Comm
 ## 4. Measurement Formulas
 
 ### Gross Rating Point, or GRP
-
-```text
-GRP = Reach × Frequency
-```
+$$
+GRP = Reach \times Frequency
+$$
 
 GRP measures broad population exposure. It is commonly used in media planning to understand total advertising pressure across a general audience.
 
