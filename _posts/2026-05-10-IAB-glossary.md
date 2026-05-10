@@ -7,7 +7,9 @@ thumbnail-img: /assets/img/posts/2026-05-10/th.png
 share-img: /assets/img/posts/2026-05-10/share.png
 tags: [advertising, ad-tech, media-buying, measurement]
 author: Pengfei Gao
+pdf: /assets/pdf/IAB-glossary-cheatsheet.pdf
 ---
+> **Cheat sheet:** [Download the one-page PDF version](/assets/pdf/IAB-glossary-cheatsheet.pdf)
 
 This note summarizes common ad-tech and media-buying concepts in a compact, interview-friendly way.
 
@@ -174,3 +176,11 @@ In advertising, most terms fall into a pipeline: define the audience, collect an
 ## References
 
 * [IAB](https://www.iab.com/wp-content/uploads/2016/04/Glossary-Formatted.pdf)
+
+---
+
+## PDF Cheat Sheet
+
+For quick review, you can also download the condensed version:
+
+[Download the Advertising Terms Cheat Sheet PDF](/assets/pdf/IAB-glossary-cheatsheet.pdf)
