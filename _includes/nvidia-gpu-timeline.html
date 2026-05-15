@@ -1,0 +1,224 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<div class="nvidia-timeline-page">
+  <main class="page">
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="pulse"></span>
+        NVIDIA GPU Evolution
+      </div>
+
+      <h1>
+        <span class="gradient-text">GPU Timeline</span><br>
+        2016 → 2026
+      </h1>
+
+      <p class="subtitle">
+        A compact timeline from Pascal P100 to Vera Rubin, highlighting the major architectural update of each generation and the shift from single-GPU acceleration to rack-scale AI factories.
+      </p>
+    </section>
+
+    <section class="timeline-wrap" aria-label="NVIDIA GPU timeline">
+      <div class="timeline">
+        <div class="axis"></div>
+
+        <div class="tick" style="left: 5%;">
+          <span>2016</span>
+        </div>
+
+        <div class="tick" style="left: 20%;">
+          <span>2020</span>
+        </div>
+
+        <div class="tick" style="left: 35%;">
+          <span>2022</span>
+        </div>
+
+        <div class="tick" style="left: 46%;">
+          <span>2023</span>
+        </div>
+
+        <div class="tick" style="left: 57%;">
+          <span>2024</span>
+        </div>
+
+        <div class="tick" style="left: 75%;">
+          <span>2025</span>
+        </div>
+
+        <div class="tick" style="left: 92%;">
+          <span>2026</span>
+        </div>
+
+        <article class="gpu-card above" style="--accent: var(--pascal); --line: 20px; left: 5%; top: 92px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>P100</h2>
+            <span class="year-pill">2016</span>
+          </div>
+          <div class="arch">Pascal</div>
+          <div class="update">HBM2 + NVLink</div>
+          <p class="desc">
+            Started the modern data-center deep learning and HPC GPU era.
+          </p>
+        </article>
+
+        <article class="gpu-card above" style="--accent: var(--ampere); --line: 54px; left: 20%; top: 58px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>A100</h2>
+            <span class="year-pill">2020</span>
+          </div>
+          <div class="arch">Ampere</div>
+          <div class="update">TF32, BF16, MIG</div>
+          <p class="desc">
+            Became the mainstream AI training workhorse for cloud and enterprise.
+          </p>
+        </article>
+
+        <article class="gpu-card above" style="--accent: var(--hopper); --line: 20px; left: 35%; top: 92px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>H100</h2>
+            <span class="year-pill">2022</span>
+          </div>
+          <div class="arch">Hopper</div>
+          <div class="update">Transformer Engine + FP8</div>
+          <p class="desc">
+            Purpose-built jump for transformers, LLM training, and inference.
+          </p>
+        </article>
+
+        <article class="gpu-card below" style="--accent: var(--hopper); --line: 98px; left: 46%; top: 400px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>H200</h2>
+            <span class="year-pill">2023</span>
+          </div>
+          <div class="arch">Hopper Refresh</div>
+          <div class="update">141 GB HBM3e</div>
+          <p class="desc">
+            Much stronger memory profile for memory-bound LLM inference and training.
+          </p>
+        </article>
+
+        <article class="gpu-card above" style="--accent: var(--blackwell); --line: 20px; left: 57%; top: 92px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>GB200</h2>
+            <span class="year-pill">2024</span>
+          </div>
+          <div class="arch">Blackwell</div>
+          <div class="update">Grace + Blackwell</div>
+          <p class="desc">
+            Moved NVIDIA AI systems toward NVLink-connected rack-scale AI factories.
+          </p>
+        </article>
+
+        <article class="gpu-card below" style="--accent: var(--pro); --line: 98px; left: 67%; top: 400px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>RTX 5090</h2>
+            <span class="year-pill">2025</span>
+          </div>
+          <div class="arch">Consumer Blackwell</div>
+          <div class="update">32 GB GDDR7</div>
+          <p class="desc">
+            Flagship local AI, gaming, and creator GPU for prosumer experimentation.
+          </p>
+        </article>
+
+        <article class="gpu-card above" style="--accent: var(--blackwell); --line: 54px; left: 77%; top: 58px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>RTX PRO 6000</h2>
+            <span class="year-pill">2025</span>
+          </div>
+          <div class="arch">Blackwell Pro</div>
+          <div class="update">96 GB GDDR7 ECC</div>
+          <p class="desc">
+            Professional workstation and server GPU for enterprise AI and graphics.
+          </p>
+        </article>
+
+        <article class="gpu-card below" style="--accent: var(--blackwell); --line: 98px; left: 87%; top: 400px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>GB300</h2>
+            <span class="year-pill">2025</span>
+          </div>
+          <div class="arch">Blackwell Ultra</div>
+          <div class="update">More memory + faster attention</div>
+          <p class="desc">
+            Boosted reasoning, long-context inference, and high-throughput AI factories.
+          </p>
+        </article>
+
+        <article class="gpu-card above" style="--accent: var(--rubin); --line: 20px; left: 95%; top: 92px;">
+          <span class="dot"></span>
+          <div class="gpu-title">
+            <h2>Rubin</h2>
+            <span class="year-pill">2026</span>
+          </div>
+          <div class="arch">Vera Rubin</div>
+          <div class="update">HBM4 + faster NVLink</div>
+          <p class="desc">
+            Next-generation AI-factory platform for massive agentic and reasoning workloads.
+          </p>
+        </article>
+      </div>
+
+      <div class="legend" aria-label="Architecture legend">
+        <span class="legend-item">
+          <span class="swatch" style="--accent: var(--pascal);"></span>
+          Pascal
+        </span>
+
+        <span class="legend-item">
+          <span class="swatch" style="--accent: var(--ampere);"></span>
+          Ampere
+        </span>
+
+        <span class="legend-item">
+          <span class="swatch" style="--accent: var(--hopper);"></span>
+          Hopper
+        </span>
+
+        <span class="legend-item">
+          <span class="swatch" style="--accent: var(--blackwell);"></span>
+          Blackwell
+        </span>
+
+        <span class="legend-item">
+          <span class="swatch" style="--accent: var(--rubin);"></span>
+          Rubin
+        </span>
+      </div>
+    </section>
+
+    <section class="notes">
+      <div class="note">
+        <h3>Core shift</h3>
+        <p>
+          NVIDIA moved from GPU-centric acceleration to node-scale and then rack-scale AI factory architecture.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3>LLM bottleneck</h3>
+        <p>
+          Modern inference is often constrained by memory capacity, memory bandwidth, KV cache, batching, and interconnect.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3>Interview summary</h3>
+        <p>
+          P100/A100 established GPU AI acceleration; H100/H200 optimized LLMs; Blackwell/Rubin scale AI factories.
+        </p>
+      </div>
+    </section>
+  </main>
+</div>
