@@ -1,0 +1,394 @@
+---
+layout: post
+title: Claude code best practices
+subtitle: Context management, agentic loop, and memory techniques
+tags: [claude code]
+author: Pengfei Gao
+full-width: true
+ext-css:
+  - "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+---
+
+<div>
+<p>
+This is a focused guide on best practices for using Claude Code effectively, with an emphasis on managing the context window, designing the agentic loop, and memory techniques to internalize these concepts. 
+</p>
+</div>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claude Code Best Practices — Memorization Guide</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: rgba(255,255,255,0.08);
+      --panel2: rgba(255,255,255,0.12);
+      --text: #e5e7eb;
+      --muted: #a7b1c2;
+      --accent: #8b5cf6;
+      --accent2: #22d3ee;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #fb7185;
+      --line: rgba(255,255,255,0.18);
+      --shadow: 0 24px 70px rgba(0,0,0,0.35);
+      --radius: 22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(139,92,246,0.38), transparent 30%),
+        radial-gradient(circle at 85% 5%, rgba(34,211,238,0.25), transparent 28%),
+        linear-gradient(135deg, #0b1020 0%, #111827 50%, #020617 100%);
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1180px, calc(100% - 34px)); margin: 0 auto; }
+    .hero { padding: 54px 0 22px; }
+    .hero-grid { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 24px; align-items: stretch; }
+    .hero-card, .card, .mini-card, .flash-area, .cheat, .palace {
+      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      backdrop-filter: blur(18px);
+    }
+    .hero-card { padding: 34px; position: relative; overflow: hidden; }
+    .hero-card:after {
+      content: ""; position: absolute; inset: auto -90px -120px auto;
+      width: 320px; height: 320px; background: radial-gradient(circle, rgba(34,211,238,0.35), transparent 60%);
+      pointer-events: none;
+    }
+    .tag { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(139,92,246,0.16); border: 1px solid rgba(139,92,246,0.45); color: #ddd6fe; font-size: 13px; font-weight: 700; }
+    h1 { font-size: clamp(34px, 5vw, 68px); line-height: 0.95; margin: 20px 0 16px; letter-spacing: -0.055em; }
+    h2 { font-size: clamp(25px, 3vw, 38px); margin: 0 0 18px; letter-spacing: -0.035em; }
+    h3 { margin: 0 0 10px; font-size: 19px; }
+    p { color: var(--muted); line-height: 1.65; }
+    .lead { font-size: 18px; max-width: 780px; color: #cbd5e1; }
+    .hero-side { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; }
+    .score { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 20px; }
+    .score > div { padding: 14px; border-radius: 16px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); }
+    .score strong { display: block; font-size: 22px; color: #fff; }
+    .nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); background: rgba(2,6,23,0.72); border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .nav .wrap { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
+    .nav a { white-space: nowrap; text-decoration: none; font-size: 13px; font-weight: 800; color: #cbd5e1; padding: 9px 12px; border-radius: 999px; background: rgba(255,255,255,0.06); }
+    section { padding: 32px 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .card { padding: 22px; }
+    .mini-card { padding: 18px; min-height: 152px; }
+    .mini-card .icon { font-size: 30px; margin-bottom: 10px; display: block; }
+    .pill { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 12px; font-weight: 800; margin-bottom: 10px; }
+    .pill.good { background: rgba(52,211,153,0.15); color: #86efac; border: 1px solid rgba(52,211,153,0.4); }
+    .pill.warn { background: rgba(251,191,36,0.16); color: #fde68a; border: 1px solid rgba(251,191,36,0.38); }
+    .pill.bad { background: rgba(251,113,133,0.15); color: #fecdd3; border: 1px solid rgba(251,113,133,0.38); }
+    .mental-model { display: grid; grid-template-columns: 0.9fr 1.3fr; gap: 18px; }
+    .loop { display: grid; gap: 14px; }
+    .step { display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: start; padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+    .num { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); font-weight: 900; color: #fff; }
+    .diagram { min-height: 420px; position: relative; overflow: hidden; }
+    .node { position: absolute; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.16); width: 180px; text-align: center; font-weight: 850; box-shadow: 0 10px 30px rgba(0,0,0,0.18); }
+    .node small { display: block; margin-top: 5px; color: var(--muted); font-weight: 600; }
+    .n-context { left: 50%; top: 30px; transform: translateX(-50%); border-color: rgba(251,191,36,0.45); }
+    .n-prompt { left: 30px; top: 160px; }
+    .n-tools { right: 30px; top: 160px; }
+    .n-loop { left: 50%; top: 190px; transform: translateX(-50%); background: linear-gradient(135deg, rgba(139,92,246,0.36), rgba(34,211,238,0.20)); }
+    .n-verify { left: 50%; bottom: 30px; transform: translateX(-50%); border-color: rgba(52,211,153,0.5); }
+    .line-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.82; }
+    .acronym { display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; }
+    .letter { padding: 16px 12px; border-radius: 18px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); text-align: center; }
+    .letter b { display: block; font-size: 30px; color: #fff; }
+    .letter span { display: block; color: var(--muted); font-size: 13px; line-height: 1.3; }
+    .compare { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 18px; }
+    .compare th, .compare td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.12); vertical-align: top; text-align: left; }
+    .compare th { color: #fff; background: rgba(255,255,255,0.08); }
+    .compare td { color: #cbd5e1; }
+    .flash-area { padding: 24px; }
+    .flash-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .btn { border: 0; border-radius: 999px; padding: 11px 15px; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent2)); font-weight: 850; cursor: pointer; box-shadow: 0 10px 24px rgba(34,211,238,0.18); }
+    .btn.secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); box-shadow: none; }
+    .flash-card { min-height: 190px; padding: 26px; border-radius: 22px; display: grid; place-items: center; text-align: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); cursor: pointer; transition: transform .25s ease, background .25s ease; }
+    .flash-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.11); }
+    .flash-card .q { font-size: clamp(22px, 3vw, 34px); font-weight: 900; letter-spacing: -0.03em; color: #fff; }
+    .flash-card .a { display: none; font-size: 20px; color: #dbeafe; line-height: 1.5; }
+    .flash-card.show .q { display: none; }
+    .flash-card.show .a { display: block; }
+    .palace { padding: 24px; }
+    .rooms { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+    .room { padding: 16px; border-radius: 18px; min-height: 150px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); }
+    .room b { display: block; color: #fff; margin-bottom: 7px; }
+    .cheat { padding: 26px; }
+    .cheat-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+    code, pre { font-family: var(--mono); }
+    pre { white-space: pre-wrap; line-height: 1.55; color: #dbeafe; padding: 16px; border-radius: 18px; background: rgba(15,23,42,0.84); border: 1px solid rgba(255,255,255,0.12); overflow-x: auto; }
+    .takeaways { display: grid; gap: 10px; }
+    .takeaway { padding: 13px 15px; border-radius: 16px; background: rgba(255,255,255,0.07); border-left: 4px solid var(--accent2); color: #dbeafe; }
+    .footer { color: #94a3b8; text-align: center; padding: 30px 0 50px; }
+    .print-note { display:none; }
+    @media (max-width: 900px) {
+      .hero-grid, .mental-model, .grid-3, .grid-2, .cheat-grid { grid-template-columns: 1fr; }
+      .acronym { grid-template-columns: repeat(2,1fr); }
+      .rooms { grid-template-columns: 1fr; }
+      .diagram { min-height: 620px; }
+      .node { left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
+      .n-context { top: 20px; } .n-prompt { top: 140px; } .n-loop { top: 260px; } .n-tools { top: 380px; } .n-verify { top: 500px; bottom: auto; }
+      .line-svg { display: none; }
+    }
+    @media print {
+      body { background: #fff; color: #111827; }
+      .nav, .btn, .flash-area { display: none; }
+      .card, .mini-card, .hero-card, .hero-side, .cheat, .palace { box-shadow: none; border: 1px solid #ddd; background: #fff; color: #111827; }
+      p, .compare td { color: #374151; }
+      .print-note { display: block; }
+    }
+  </style>
+<body>
+  <nav class="nav">
+    <div class="wrap">
+      <a href="#diagnosis">Diagnosis</a>
+      <a href="#model">Mental Model</a>
+      <a href="#gaps">Knowledge Gaps</a>
+      <a href="#memory">Memory Tools</a>
+      <a href="#flashcards">Flashcards</a>
+      <a href="#cheatsheet">Cheat Sheet</a>
+    </div>
+  </nav>
+
+  <header class="hero wrap">
+    <div class="hero-grid">
+      <div class="hero-card">
+        <span class="tag">⚙️ Claude Code Best Practices · Focused Learning</span>
+        <h1>From “AI Helper” to<br/>Engineering Harness</h1>
+        <p class="lead">Your core idea is correct: Claude Code is most effective when surrounded by context, tools, tests, and verification. The next level is learning to manage the scarce resource: <b>context window quality</b>.</p>
+        <div class="score">
+          <div><strong>✅ 70%</strong><span>already understood</span></div>
+          <div><strong>⚠️ 25%</strong><span>needs sharpening</span></div>
+          <div><strong>❌ 5%</strong><span>misunderstood</span></div>
+        </div>
+      </div>
+      <aside class="hero-side">
+        <div>
+          <h3>One-line takeaway</h3>
+          <p><b>Claude Code succeeds when you design the loop around it:</b> context in, tools around, verification after, and clean sessions throughout.</p>
+        </div>
+        <pre>Mnemonic: C.L.A.U.D.E.
+C = Context budget
+L = Loop: explore → plan → code → verify
+A = Artifacts: tests, screenshots, expected output
+U = Utilities: CLI, MCP, skills, hooks
+D = Delegate: subagents, worktrees, reviewers
+E = Exit clutter: clear, compact, rewind</pre>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section id="diagnosis" class="wrap">
+      <h2>1. What you already know</h2>
+      <div class="grid-3">
+        <div class="mini-card"><span class="icon">🧰</span><span class="pill good">Correct</span><h3>Harness matters</h3><p>You understand that Claude Code should not operate alone. MCP servers, skills, CLAUDE.md, subagents, and tools increase capability.</p></div>
+        <div class="mini-card"><span class="icon">🧪</span><span class="pill good">Correct</span><h3>Verification is central</h3><p>You know tests, validation commands, screenshots, and expected outputs let Claude check its own work.</p></div>
+        <div class="mini-card"><span class="icon">🔁</span><span class="pill good">Correct</span><h3>Agentic loop</h3><p>You correctly see the loop as planning, execution, and verification, with less manual micro-management from you.</p></div>
+        <div class="mini-card"><span class="icon">📁</span><span class="pill good">Correct</span><h3>Relevant files matter</h3><p>You understand that prompts should connect Claude to relevant files, folders, examples, and project conventions.</p></div>
+        <div class="mini-card"><span class="icon">🧭</span><span class="pill warn">Needs sharper boundary</span><h3>Plan mode</h3><p>You know planning matters, but the missing detail is when to use plan mode and when to skip it for small obvious diffs.</p></div>
+        <div class="mini-card"><span class="icon">🪟</span><span class="pill warn">Main gap</span><h3>Context window</h3><p>The key constraint is not only “limited context”; it is that performance degrades as noisy context accumulates.</p></div>
+      </div>
+    </section>
+
+    <section id="model" class="wrap">
+      <h2>2. Clear mental model</h2>
+      <div class="mental-model">
+        <div class="card">
+          <h3>The “Autonomous Junior+ Engineer” Model</h3>
+          <p>Think of Claude Code as a strong engineer who can read, run, edit, test, and commit — but whose working memory gets polluted quickly.</p>
+          <div class="loop">
+            <div class="step"><div class="num">1</div><div><b>Feed precise context</b><br/><span>Files, examples, constraints, symptoms, success criteria.</span></div></div>
+            <div class="step"><div class="num">2</div><div><b>Choose the right mode</b><br/><span>Plan mode for uncertain multi-file work; direct mode for tiny clear edits.</span></div></div>
+            <div class="step"><div class="num">3</div><div><b>Give tools and guardrails</b><br/><span>CLAUDE.md, skills, hooks, MCP, CLI tools, permissions.</span></div></div>
+            <div class="step"><div class="num">4</div><div><b>Verify before trusting</b><br/><span>Tests, lint, typecheck, screenshots, root-cause validation.</span></div></div>
+            <div class="step"><div class="num">5</div><div><b>Keep context clean</b><br/><span>/clear, /compact, /rewind, subagents, fresh reviewer sessions.</span></div></div>
+          </div>
+        </div>
+        <div class="card diagram">
+          <svg class="line-svg" viewBox="0 0 700 420" preserveAspectRatio="none">
+            <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="rgba(226,232,240,.75)"/></marker></defs>
+            <path d="M350 95 C200 120 140 150 120 190" stroke="rgba(226,232,240,.55)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M350 95 C500 120 560 150 580 190" stroke="rgba(226,232,240,.55)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M165 205 C230 230 260 245 310 265" stroke="rgba(226,232,240,.55)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M535 205 C470 230 440 245 390 265" stroke="rgba(226,232,240,.55)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+            <path d="M350 300 C350 330 350 345 350 365" stroke="rgba(226,232,240,.55)" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+          </svg>
+          <div class="node n-context">Context Budget<small>scarce resource</small></div>
+          <div class="node n-prompt">Prompt Context<small>files · examples · scope</small></div>
+          <div class="node n-tools">Harness Tools<small>MCP · skills · hooks</small></div>
+          <div class="node n-loop">Agentic Loop<small>explore → plan → implement</small></div>
+          <div class="node n-verify">Verification<small>tests · lint · screenshots</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gaps" class="wrap">
+      <h2>3. Most important gaps and corrections</h2>
+      <div class="grid-2">
+        <div class="card">
+          <span class="pill warn">Gap 1</span>
+          <h3>Context is the real budget</h3>
+          <p>Best practices mostly follow from one constraint: the context window fills with conversation, file reads, and command outputs. As it fills, quality can drop. The goal is not “give Claude everything,” but “give Claude the smallest sufficient context.”</p>
+        </div>
+        <div class="card">
+          <span class="pill warn">Gap 2</span>
+          <h3>CLAUDE.md is not a knowledge dump</h3>
+          <p>Use CLAUDE.md for broad, stable, high-value instructions: commands, style rules, workflow expectations, gotchas. Put occasional domain knowledge into skills instead, so it loads only when relevant.</p>
+        </div>
+        <div class="card">
+          <span class="pill warn">Gap 3</span>
+          <h3>Hooks are stronger than instructions</h3>
+          <p>CLAUDE.md is advisory. Hooks are deterministic. If something must happen every time, such as eslint after edits or blocking writes to migrations, use a hook.</p>
+        </div>
+        <div class="card">
+          <span class="pill bad">Correction</span>
+          <h3>You still own the feedback loop</h3>
+          <p>Claude can run the agentic loop, but you should still stop it early when direction is wrong, verify success criteria, and reset when the session becomes polluted. Less micromanagement does not mean no steering.</p>
+        </div>
+        <div class="card">
+          <span class="pill warn">Gap 4</span>
+          <h3>Use subagents to protect main context</h3>
+          <p>For broad investigation, code review, security review, or edge-case hunting, delegate to subagents. They read lots of files in separate context and return compressed findings.</p>
+        </div>
+        <div class="card">
+          <span class="pill warn">Gap 5</span>
+          <h3>Scale with parallelism</h3>
+          <p>Use worktrees, multiple sessions, non-interactive <code>claude -p</code>, and writer/reviewer patterns. A fresh reviewer session often catches issues because it is not biased by the implementation history.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <h2>4. Tool choice: what goes where?</h2>
+      <table class="compare">
+        <thead><tr><th>Mechanism</th><th>Use for</th><th>Memory hook</th></tr></thead>
+        <tbody>
+          <tr><td><b>CLAUDE.md</b></td><td>Stable project rules: commands, style, workflows, gotchas, repo etiquette.</td><td>“Project constitution.”</td></tr>
+          <tr><td><b>Skills</b></td><td>Reusable domain knowledge or workflows that should load on demand.</td><td>“Specialized manuals.”</td></tr>
+          <tr><td><b>Hooks</b></td><td>Actions that must always happen, with zero exceptions.</td><td>“Automation tripwires.”</td></tr>
+          <tr><td><b>MCP servers</b></td><td>External systems: Figma, Notion, database, issue tracker, monitoring.</td><td>“Tool portals.”</td></tr>
+          <tr><td><b>Subagents</b></td><td>Isolated research, review, security, edge-case analysis.</td><td>“Separate specialists.”</td></tr>
+          <tr><td><b>CLI tools</b></td><td>Context-efficient access to GitHub, cloud, logs, incidents, deploys.</td><td>“Short path to truth.”</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="memory" class="wrap">
+      <h2>5. Memory techniques</h2>
+      <div class="card">
+        <h3>Acronym: C.L.A.U.D.E.</h3>
+        <div class="acronym">
+          <div class="letter"><b>C</b><span>Context<br/>budget</span></div>
+          <div class="letter"><b>L</b><span>Loop<br/>plan-code-verify</span></div>
+          <div class="letter"><b>A</b><span>Artifacts<br/>tests/screens</span></div>
+          <div class="letter"><b>U</b><span>Utilities<br/>MCP/CLI/hooks</span></div>
+          <div class="letter"><b>D</b><span>Delegate<br/>subagents</span></div>
+          <div class="letter"><b>E</b><span>Exit<br/>clutter</span></div>
+        </div>
+      </div>
+      <div class="palace" style="margin-top:16px;">
+        <h3>Memory Palace: “The Claude Workshop”</h3>
+        <div class="rooms">
+          <div class="room"><b>Door: Prompt</b>Before entering, write scope, files, constraints, success criteria.</div>
+          <div class="room"><b>Desk: Plan</b>For hard work, explore first, then plan. For tiny work, skip overhead.</div>
+          <div class="room"><b>Tool Wall: Harness</b>MCP, CLI, skills, hooks, subagents each have a job.</div>
+          <div class="room"><b>Test Bench: Verify</b>Nothing leaves the shop without tests, lint, screenshots, or expected output.</div>
+          <div class="room"><b>Trash Bin: Clear</b>When context is noisy, clear, compact, rewind, or start a reviewer session.</div>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card"><h3>Analogy</h3><p>Claude Code is like a smart contractor. You do not hover over every hammer swing, but you must provide blueprints, site access, building codes, inspection criteria, and a clean workspace.</p></div>
+        <div class="card"><h3>Concept map in one sentence</h3><p><b>Prompt quality</b> selects the target, <b>context hygiene</b> preserves reasoning, <b>harness tools</b> extend reach, <b>verification</b> closes the loop, and <b>session management</b> keeps quality high.</p></div>
+      </div>
+    </section>
+
+    <section id="flashcards" class="wrap">
+      <div class="flash-area">
+        <div class="flash-top">
+          <div><h2 style="margin-bottom:4px;">6. Flashcards</h2><p style="margin:0;">Click the card to reveal the answer.</p></div>
+          <div><button class="btn secondary" onclick="prevCard()">← Prev</button> <button class="btn" onclick="nextCard()">Next →</button></div>
+        </div>
+        <div id="flashCard" class="flash-card" onclick="toggleAnswer()">
+          <div class="q"></div>
+          <div class="a"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cheatsheet" class="wrap">
+      <div class="cheat">
+        <h2>7. Final cheat sheet</h2>
+        <div class="cheat-grid">
+          <div>
+            <h3>Best-practice prompt template</h3>
+            <pre>Goal: [what to build/fix]
+Scope: [files/folders/components]
+Context: [patterns/docs/errors/screenshots]
+Constraints: [no new library, latency, style]
+Verification: [test/lint/typecheck/screenshot]
+Behavior: explore first if uncertain; otherwise implement directly.</pre>
+          </div>
+          <div>
+            <h3>When Claude struggles</h3>
+            <div class="takeaways">
+              <div class="takeaway">After 2 failed corrections: /clear and restart with a sharper prompt.</div>
+              <div class="takeaway">For broad investigation: use subagents to keep main context clean.</div>
+              <div class="takeaway">For mandatory behavior: use hooks, not just CLAUDE.md.</div>
+              <div class="takeaway">For large changes: explore → plan → implement → verify → commit.</div>
+              <div class="takeaway">For unrelated tasks: /clear before switching topics.</div>
+            </div>
+          </div>
+        </div>
+        <h3 style="margin-top:22px;">One-line takeaways</h3>
+        <div class="takeaways">
+          <div class="takeaway">Context is the scarce resource; do not waste it with kitchen-sink sessions.</div>
+          <div class="takeaway">Verification is the highest-leverage input you can give Claude.</div>
+          <div class="takeaway">CLAUDE.md is for stable rules; skills are for on-demand knowledge; hooks are for guaranteed actions.</div>
+          <div class="takeaway">Subagents are context firebreaks: let them investigate and report back.</div>
+          <div class="takeaway">You are not writing every line; you are designing the engineering loop.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    Built as a standalone memorization page. Save this file and open it in any browser.
+  </footer>
+
+  <script>
+    const cards = [
+      {q: "What is the #1 scarce resource in Claude Code?", a: "The context window. It fills with messages, file reads, and command outputs; quality can degrade as it becomes noisy."},
+      {q: "What is the highest-leverage thing you can give Claude?", a: "Verification: tests, expected outputs, screenshots, lint/typecheck commands, and clear success criteria."},
+      {q: "When should you use plan mode?", a: "Use it for uncertain, multi-file, unfamiliar, or high-risk changes. Skip it for tiny obvious diffs."},
+      {q: "What belongs in CLAUDE.md?", a: "Stable project rules: commands, code style, workflow rules, repo etiquette, gotchas, and environment quirks."},
+      {q: "What should not go into CLAUDE.md?", a: "Long tutorials, detailed API docs, frequently changing info, file-by-file descriptions, or rules Claude already follows."},
+      {q: "Hooks vs CLAUDE.md?", a: "CLAUDE.md is advisory. Hooks are deterministic and should be used when an action must always happen."},
+      {q: "Why use subagents?", a: "They investigate or review in separate context windows, protecting the main conversation from context pollution."},
+      {q: "What is the kitchen-sink session failure pattern?", a: "Mixing unrelated tasks in one long session until context becomes noisy. Fix it with /clear between tasks."},
+      {q: "What should you do after two failed corrections?", a: "Start fresh with /clear and a better prompt that incorporates what you learned."},
+      {q: "What is the writer/reviewer pattern?", a: "One Claude session implements; a fresh separate session reviews for edge cases, consistency, and risks."}
+    ];
+    let idx = 0;
+    const el = document.getElementById('flashCard');
+    function renderCard(){
+      el.classList.remove('show');
+      el.querySelector('.q').textContent = cards[idx].q;
+      el.querySelector('.a').textContent = cards[idx].a;
+    }
+    function toggleAnswer(){ el.classList.toggle('show'); }
+    function nextCard(){ idx = (idx + 1) % cards.length; renderCard(); }
+    function prevCard(){ idx = (idx - 1 + cards.length) % cards.length; renderCard(); }
+    renderCard();
+  </script>
+</body>
